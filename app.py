@@ -3,11 +3,11 @@ import string
 import subprocess
 from flask import Flask 
 import atexit
-from apscheduler.scheduler import Scheduler
+# from apscheduler.scheduler import Scheduler
 
 app = Flask(__name__, static_folder='hash/', static_url_path="/hash/")
-cron = Scheduler(daemon=True)
-cron.start()
+# cron = Scheduler(daemon=True)
+# cron.start()
 
 @app.route('/stamp/<string:hash_256>', methods=['POST'])
 def stamp(hash_256):
@@ -17,7 +17,7 @@ def stamp(hash_256):
             subprocess.call(command, cwd="hash/")
         return '/hash/' + hash_256 
 
-@cron.interval_schedule(hours=3)
+# @cron.interval_schedule(hours=3)
 def upgrade():
     command = ["ots", "upgrade", "*.ots"]
     subprocess.call(command, cwd="hash/")
@@ -36,4 +36,4 @@ def is_hash(hash_256: str) -> bool:
         return False
     return False
 
-atexit.register(lambda: cron.shutdown(wait=False))
+# atexit.register(lambda: cron.shutdown(wait=False))
