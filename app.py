@@ -6,7 +6,7 @@ import atexit
 from flask_caching import Cache
 # from apscheduler.scheduler import Scheduler
 
-app = Flask(__name__, static_folder='hash/', static_url_path="/hash/")
+app = Flask(__name__, static_folder='/hash/', static_url_path="/hash/")
 cache = Cache(app, config={
     'CACHE_TYPE': 'simple'
 })
@@ -17,18 +17,19 @@ cache = Cache(app, config={
 @cache.cached(timeout=None)
 def stamp(hash_256):
     if is_hash(hash_256):
-        if not os.path.isfile("hash/" + hash_256):
+        if not os.path.isfile("/hash/" + hash_256):
             command = ["ots-cli.js", "stamp", "-d", hash_256]
-            subprocess.call(command, cwd="hash/")
+            subprocess.call(command, cwd="/hash/")
         return '/hash/' + hash_256 
 
 # @cron.interval_schedule(hours=3)
 @app.route('/upgrade', methods=['GET', 'POST'])
-@cache.cached(timeout=720)
+@cache.cached(timeout=1000)
 def upgrade():
-    command = ["ots", "upgrade", "*.ots"]
-    subprocess.call(command, cwd="hash/")
-    return
+    command = ["ots upgrade *.ots"]
+    # subprocess.call(command, shell=True)
+    subprocess.call(command, cwd="/hash/", shell=True)
+    return "Upgraded!"
 
 
 def is_hash(hash_256: str) -> bool:
