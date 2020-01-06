@@ -3,13 +3,18 @@ import string
 import subprocess
 from flask import Flask 
 import atexit
+from flask_caching import Cache
 # from apscheduler.scheduler import Scheduler
 
 app = Flask(__name__, static_folder='hash/', static_url_path="/hash/")
+cache = Cache(app, config={
+    'CACHE_TYPE': 'simple'
+})
 # cron = Scheduler(daemon=True)
 # cron.start()
 
 @app.route('/stamp/<string:hash_256>', methods=['POST'])
+@cache.cached(timeout=None)
 def stamp(hash_256):
     if is_hash(hash_256):
         if not os.path.isfile("hash/" + hash_256):
@@ -18,9 +23,12 @@ def stamp(hash_256):
         return '/hash/' + hash_256 
 
 # @cron.interval_schedule(hours=3)
+@app.route('/upgrade', methods=['GET', 'POST'])
+@cache.cached(timeout=720)
 def upgrade():
     command = ["ots", "upgrade", "*.ots"]
     subprocess.call(command, cwd="hash/")
+    return
 
 
 def is_hash(hash_256: str) -> bool:
