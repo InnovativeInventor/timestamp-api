@@ -14,13 +14,13 @@ cache = Cache(app, config={
 # cron.start()
 
 @app.route('/stamp/<string:hash_256>', methods=['POST'])
-@cache.cached(timeout=None)
+@cache.memoize(timeout=None)
 def stamp(hash_256):
     if is_hash(hash_256):
-        if not os.path.isfile("/hash/" + hash_256):
-            command = ["ots-cli.js", "stamp", "-d", hash_256]
+        if not os.path.isfile("/hash/" + str(hash_256).rstrip() + ".ots"):
+            command = ["ots-cli.js", "stamp", "-d", str(hash_256).rstrip()]
             subprocess.call(command, cwd="/hash/")
-        return '/hash/' + str(hash_256) + ".ots"
+        return '/hash/' + str(hash_256).rstrip() + ".ots"
 
 # @cron.interval_schedule(hours=3)
 @app.route('/upgrade', methods=['GET', 'POST'])
