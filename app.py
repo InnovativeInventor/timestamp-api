@@ -20,7 +20,7 @@ def stamp(hash_256):
         if not os.path.isfile("/hash/" + hash_256):
             command = ["ots-cli.js", "stamp", "-d", hash_256]
             subprocess.call(command, cwd="/hash/")
-        return '/hash/' + hash_256 
+        return '/hash/' + str(hash_256) + ".ots"
 
 # @cron.interval_schedule(hours=3)
 @app.route('/upgrade', methods=['GET', 'POST'])
